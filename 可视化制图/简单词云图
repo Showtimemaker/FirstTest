@@ -1,0 +1,50 @@
+import re
+import jieba.analyse
+import wordcloud
+from imageio import imread
+with open("try.txt", encoding='utf-8') as file_object1:
+    contents1 = file_object1.read()
+
+# 普通分词
+from collections import Counter
+
+cut_words = ""
+for line in open('try.txt', encoding='utf-8'):
+    line.strip('\n')
+    line = re.sub("[A-Za-z0-9\：\·\—\，\。\“ \”]", "", line)
+    seg_list = jieba.cut(line, cut_all=False)
+    cut_words += (" ".join(seg_list))
+all_words = cut_words.split()
+print(all_words)
+c = Counter()
+for x in all_words:
+    if len(x) > 1 and x != '\r\n':
+        c[x] += 1
+# 输出词频最高的前五个词
+print('\n词频统计结果：')
+for (k, v) in c.most_common(5):
+    print("%s:%d" % (k, v))
+    print('\n')
+# 按词频占比排序 使用WordCloud生成词云
+txt1_list = jieba.analyse.extract_tags(contents1, topK=5, withWeight=True)
+txt1_dict = {}
+
+for i in txt1_list:
+    txt1_dict[i[0]] = i[1]
+    wordlist = []
+    wordlist.append(i[0])
+print(txt1_dict)
+
+bg_pic = imread("C:\\Users\\周恒\\Desktop\\zhao0.jpg")
+
+word_cloud = wordcloud.WordCloud(font_path="simsun.ttc",  # 设置词云字体
+                                 background_color="white",  # 词云图的背景颜色
+                                 scale=10,
+                                 width=700,
+                                 height=300,
+                                 max_words=300,
+                                 max_font_size=200,
+                                collocations=False,
+                                 mask=bg_pic)  # 分辨率
+wc = word_cloud.generate(contents1)
+wc.to_file('cloud.jpg')  # 保存图片
